@@ -1,0 +1,8 @@
+0#21/10/2013#pasturenzi#francesco#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+0#22/10/2013#clerico#anno di corso 2#sezione b#Indirizzo di studi torino#ingresso in ritardo#11:22
+0#23/10/2013#ercoli#anno di corso 3#sezione a#Indirizzo di studi milano#ingresso in ritardo
+0#24/10/2013#larini#giovanna#anno di corso 1#sezione a#Indirizzo di studi catania#uscita anticipata#12:20
+0#pasturenzi#anno di corso 1#sezione d#Indirizzo di studi maxwell#ingresso in ritardo#15:20
+
+
+
