@@ -1,0 +1,306 @@
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+
+init with {:
+	System.out.println("PARSERRIZZO...");
+:};
+
+
+parser code {:
+	public static int flagLogin = 0;
+	public static int flagLogout = 0;
+	public int codCom = -1;
+	public int dataVuota = 0;
+	public int isCorrect = 0; //a livello di istanza NON di classe.
+	public Comando comandoDigitato = null; //a livello di istanza NON di classe.
+		
+	//ritorna il valore semantico che cè all'interno dello stack ad una certa posizione
+    public Object stack(int position) {
+        return (((Symbol)stack.elementAt(tos+position)).value);
+    }
+	
+:};
+action code {:
+	
+	int flagDebug = 0;
+	private void stampa(String s){ 
+        if (flagDebug == 1){
+            System.out.println(s);           
+        }
+    }
+
+:}
+
+// Terminal tokens
+terminal String DATA;
+terminal String ORA;
+terminal String OPERAZIONE;
+terminal String CLASSE;
+terminal String SEZIONE;
+terminal String INDIRIZZO;
+terminal String STRINGA;
+terminal USER, U, LOGOUT, LOGIN,  SEP, ZERO, UNO, DUE;
+
+// NON Terminal tokens
+non terminal progr;
+non terminal logins, comandi, comando;
+non terminal String datas;
+non terminal String strs;
+non terminal String clases;
+non terminal String seziones;
+non terminal String indirizzos;
+non terminal String operaziones;
+non terminal String oras;
+
+// Precedences and associativities
+// lower precedences
+precedence left SEP;
+// higher precedences
+
+//////////////////////////////////////
+// Grammar start
+//////////////////////////////////////
+
+start with progr;
+
+progr ::= logins {: stampa("OK, FINE PARSER!"); :}  
+	| comandi {: stampa("OK, FINE DEL PARSER !!!"); :} 
+	| LOGOUT {: 
+				parser.flagLogin = 0;
+				parser.flagLogout = 1;
+				stampa("OK, FINE DEL PARSER !!!"); 
+			:}  
+	| error {: System.out.println("Controllare la sintassi: u <user> <password>, User <user> <password>, Login <user> <password> oppure 0# | 1# | 2#"); :};
+
+logins ::= LOGIN STRINGA:ut STRINGA:ps {: 
+											
+										String user = new String(ut);
+										String pass = new String(ps);
+										if( user.equals("sebastiano") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con LOGIN.");
+										}else if(user.equals("francesco") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con LOGIN.");
+										}
+										
+										:} 
+										
+										//user: silvia pass: password NON è ACCETTATA
+										
+            | USER STRINGA:ut STRINGA:ps {: 
+			
+										String user = new String(ut);
+										String pass = new String(ps);
+										if( user.equals("sebastiano") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con USER.");
+										}else if(user.equals("francesco") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con USER.");
+										}
+
+										:} 
+            | U STRINGA:ut STRINGA:ps {: 
+										
+										String user = new String(ut);
+										String pass = new String(ps);
+										if( user.equals("sebastiano") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con U.");
+										}else if(user.equals("francesco") && pass.equals("password") ){
+											parser.flagLogin = 1;
+											stampa("debug: Autenticazione con U.");
+										}
+										
+										:}  
+			| LOGIN STRINGA:ut error {: stampa("debug: Manca la password"); :} 
+			| USER STRINGA:ut error {: stampa("debug: Manca la password"); :} 
+			| U STRINGA:ut error {: stampa("debug: Manca la password"); :} 
+			| LOGIN error STRINGA:ps {: stampa("debug: Manca l'user"); :} 
+			| USER error STRINGA:ps {: stampa("debug: Manca l'user"); :} 
+			| U error STRINGA:ps {: stampa("debug: Manca l'user"); :} 
+			;
+            
+            
+comandi ::= comando {: 
+						if(parser.codCom == 1 && parser.dataVuota == 1){
+								parser.comandoDigitato.data = "none";
+						}
+
+					:} 
+            | comandi comando {:
+									if(parser.codCom == 1 && parser.dataVuota == 1){
+											parser.comandoDigitato.data = "none";
+									}
+			
+								:}
+			;
+			
+            
+comando ::= ZERO SEP datas:dt STRINGA:cogn SEP strs:nome CLASSE:cla SEP SEZIONE:sez SEP INDIRIZZO:ind SEP OPERAZIONE:oper {: 
+																									GregorianCalendar gc = new GregorianCalendar();
+																									int ore = gc.get(Calendar.HOUR_OF_DAY);
+																									int min = gc.get(Calendar.MINUTE);
+																									String orario = new String(""+ore+":"+min);
+																									
+																									//DATA
+																									stampa("debug: "+dt);
+																									//COGNOME
+																									stampa("debug: "+cogn);
+																									//NOME
+																									stampa("debug: "+nome);
+																									//CLASSE
+																									stampa("debug: "+cla);
+																									//SEZIONE
+																									stampa("debug: "+sez);
+																									//INDIRIZZO
+																									stampa("debug: "+ind);
+																									//OPERAZIONE
+																									stampa("debug: "+oper);
+																									//ORA
+																									stampa("debug: ora assente, quindi OGGI: "+ore + ":" + min); 
+
+																									parser.isCorrect = 1;
+																									parser.comandoDigitato = new Comando(new String("INSERT"),
+																																		new String(dt),
+																																		new String(cogn),
+																																		new String(nome),
+																																		new String(cla),
+																																		new String(sez),
+																																		new String(ind),
+																																		new String(oper),
+																																		new String(orario)
+																																		);
+																									parser.codCom = 0;
+																									stampa("COMANDO ZERO\n\n"); 
+																									:} 
+																									
+            | ZERO SEP datas:dt STRINGA:cogn SEP strs:nome CLASSE:cla SEP SEZIONE:sez  SEP INDIRIZZO:ind  SEP OPERAZIONE:oper SEP oras:ora  {:
+																									//DATA
+																									stampa("debug: "+dt);
+																									//COGNOME
+																									stampa("debug: "+cogn);
+																									//NOME
+																									stampa("debug: "+nome);
+																									//CLASSE
+																									stampa("debug: "+cla);
+																									//SEZIONE
+																									stampa("debug: "+sez);
+																									//INDIRIZZO
+																									stampa("debug: "+ind);
+																									//OPERAZIONE
+																									stampa("debug: "+oper);
+																									//ORA
+																									stampa("debug: "+ora);
+																									
+																									parser.isCorrect = 1;
+																									parser.comandoDigitato = new Comando(new String("INSERT"),
+																																		new String(dt),
+																																		new String(cogn),
+																																		new String(nome),
+																																		new String(cla),
+																																		new String(sez),
+																																		new String(ind),
+																																		new String(oper),
+																																		new String(ora)
+																																		);
+																									parser.codCom = 0;
+																									stampa("COMANDO ZERO\n\n");
+																									:} 
+            | UNO  SEP datas:dt strs:stringa clases:cla seziones:sez indirizzos:ind operaziones:oper oras:ora {: 					
+																					//DATA
+																					stampa("debug: "+dt);
+																					
+																					//COGNOME eo NOME
+																					stampa("debug: "+stringa);																					
+																					String[] temp;
+																					temp = stringa.split(" ");
+																					
+																					//CLASSE
+																					stampa("debug: "+cla);
+																					//SEZIONE
+																					stampa("debug: "+sez);
+																					//INDIRIZZO
+																					stampa("debug: "+ind);
+																					//OPERAZIONE
+																					stampa("debug: "+oper);
+																					//ORA
+																					stampa("debug: "+ora);
+																					
+																					
+																					parser.isCorrect = 1;
+																					parser.comandoDigitato = new Comando(new String("SELECT"),
+																																		new String(dt),
+																																		new String(temp[0].toString()),
+																																		new String(temp[1].toString()),
+																																		new String(cla),
+																																		new String(sez),
+																																		new String(ind),
+																																		new String(oper),
+																																		new String(ora)
+																																		);
+																					
+																					parser.codCom = 1;
+																					stampa("COMANDO UNO\n\n");
+																					:} 
+            | DUE  SEP DATA:dt  SEP STRINGA:cogn  SEP STRINGA:nome {: 
+																	//DATA
+																	stampa("debug: "+dt);
+																	//COGNOME
+																	stampa("debug: "+cogn);
+																	//NOME
+																	stampa("debug: "+nome);
+																	
+																	
+																	
+																	parser.isCorrect = 1;
+																	parser.comandoDigitato = new Comando(new String("DELETE"),
+																											new String(dt),
+																											new String(cogn),
+																											new String(nome));
+																	
+																	stampa("COMANDO DUE\n\n"); 
+																:} ;
+
+datas ::= DATA:dt SEP {:RESULT = new String(dt);:} 
+			| DATA:dt {:RESULT = new String(dt);:} 
+			| {: 
+				
+			
+					GregorianCalendar gc = new GregorianCalendar();
+					int anno = gc.get(Calendar.YEAR);
+					int mese = gc.get(Calendar.MONTH) + 1;
+					int giorno = gc.get(Calendar.DATE);
+
+					System.out.println("data assente, quindi OGGI: "+giorno + "/" + mese + "/" + anno); 
+					RESULT = new String( (""+giorno + "/" + mese + "/" + anno) );
+					
+					parser.dataVuota = 1;
+					
+				
+			:}; 
+strs ::=  STRINGA:stringa1 SEP STRINGA:stringa2 SEP {:RESULT = new String(""+stringa1+" "+stringa2);:} 
+			| STRINGA:stringa1 SEP STRINGA:stringa2  {:RESULT = new String(""+stringa1+" "+stringa2);:} 
+			| STRINGA:stringa SEP  {:RESULT = new String(""+stringa+" none");:} 
+			| STRINGA:stringa {:RESULT = new String(""+stringa+" none");:}  
+			| {:RESULT = new String("none none");:} ;
+			
+clases ::= CLASSE:cl SEP  {:RESULT = new String(cl);:} 
+			| CLASSE:cl  {:RESULT = new String(cl);:} 
+			| {:RESULT = new String("none");:};
+			
+seziones ::= SEZIONE:sez SEP  {:RESULT = new String(sez);:} 
+			| SEZIONE:sez   {:RESULT = new String(sez);:} 
+			| {:RESULT = new String("none");:};
+			
+indirizzos ::= INDIRIZZO:ind SEP  {:RESULT = new String(ind);:}
+				| INDIRIZZO:ind  {:RESULT = new String(ind);:}
+				| {:RESULT = new String("none");:};
+operaziones ::= OPERAZIONE:oper SEP  {:RESULT = new String(oper);:}
+				| OPERAZIONE:oper {:RESULT = new String(oper);:}
+				| {:RESULT = new String("none");:};
+oras ::=  ORA:ora {:RESULT = new String(ora);:}
+			| {:RESULT = new String("none");:};
+

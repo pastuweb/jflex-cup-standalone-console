@@ -1,0 +1,13 @@
+0#22/10/2013#pasturenzi#francesco#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+0#22/10/2013#pasturenzi#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+0#22/10/2013#pasturenzi#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo
+0#22/10/2013#pasturenzi#francesco#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+0#pasturenzi#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+1#22/10/2013
+1#22/10/2013#pasturenzi#francesco
+1#22/10/2013#pasturenzi#anno di corso 1#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+1#22/10/2013#pasturenzi#sezione a#Indirizzo di studi polito#ingresso in ritardo#11:20
+1#anno di corso 1#sezione a#Indirizzo di studi polito
+2#22/10/2013#pasturenzi#francesco
+
+
