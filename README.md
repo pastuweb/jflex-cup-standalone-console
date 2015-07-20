@@ -1,5 +1,7 @@
 # jflex-cup-standalone-console
-Automatically exported from code.google.com/p/jflex-cup-standalone-console
+-
+It was a project shared by Google Code Hosting Projects.
+-
 
 This program built with Java, JFLEX (scanner), CUP (parser) and JDBC allows you to simulate a command line to be validated. 
 
